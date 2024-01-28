@@ -1,6 +1,7 @@
 Flask==2.2.5
 Flask-CORS==3.0.10
 Spacy==3.4.1
+typing_extensions<4.6.0
 thinc==8.1.0
 NetworkX==2.8.7
 Werkzeug==2.3.3
