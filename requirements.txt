@@ -1,0 +1,5 @@
+Flask==2.2.2
+Flask-CORS==3.0.10
+Spacy==3.4.1
+NetworkX==2.8.7
+gunicorn==20.1.0
