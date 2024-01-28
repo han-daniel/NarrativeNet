@@ -1,4 +1,5 @@
 # NarrativeNet
+https://narrative-net-8d9c8f56d50d.herokuapp.com
 NarrativeNet is a web application built with Flask that provides powerful text analysis and visualization tools for movie and series synopses. It offers the following features:
 
 Text Analysis: Input a movie or series synopsis, and NarrativeNet extracts and analyzes key characters and their relationships within the narrative.
