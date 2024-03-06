@@ -7,7 +7,8 @@ Centrality Scores: Gain insights into character importance with centrality score
 Export Data: Export the network graph as a JSON object and centrality scores as CSV files for further analysis or visualization.\
 
 NarrativeNet assists storytellers, screenwriters, and researchers to explore the dynamics of characters within narratives, providing insights for creative and analytical purposes.
-<img width="1286" alt="Screenshot 2024-01-28 at 4 16 17 PM" src="https://github.com/han-daniel/NarrativeNet/assets/43096627/ff5662cf-43c3-48fb-9dad-328797c115cd">
+<img width="521" alt="Screenshot 2024-03-06 at 7 15 12 AM" src="https://github.com/han-daniel/NarrativeNet/assets/43096627/049ce53e-8f1a-4414-b353-1326bed87ddd">
+
 
 Here is a GPT demonstration of what more is to come: https://chat.openai.com/g/g-XxOvU8XXk-narrativenet.
 <img width="512" alt="Screenshot 2023-11-30 at 7 44 49 PM" src="https://github.com/han-daniel/NarrativeNet/assets/43096627/ee7a5597-2bcc-4824-9719-fb1e5c3ee706">
