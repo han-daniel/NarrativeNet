@@ -1,61 +1,44 @@
 # text_processing.py
 import spacy
-from transformers import BertTokenizer, BertForMaskedLM
 
-nlp = spacy.load("en_core_web_sm")
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-model = BertForMaskedLM.from_pretrained("bert-base-uncased")
+nlp = spacy.load("en_core_web_md")
 
-def chunk_text(text, max_length=1024):
-    words = text.split()
-    chunks = []
-    current_chunk = []
+def resolve_coreference(text):
+    doc = nlp(text)
+    resolved_text = []
 
-    for word in words:
-        if len(current_chunk) + len(word.split()) <= max_length:
-            current_chunk.append(word)
+    for token in doc:
+        if token.pos_ == "PRON" and token.dep_ in ["nsubj", "dobj", "pobj"]:
+            antecedent = find_antecedent(token)
+            if antecedent:
+                resolved_text.append(antecedent.text)
+            else:
+                resolved_text.append(token.text)
         else:
-            chunks.append(" ".join(current_chunk))
-            current_chunk = [word]
+            resolved_text.append(token.text)
 
-    if current_chunk:
-        chunks.append(" ".join(current_chunk))
+    return " ".join(resolved_text)
 
-    return chunks
-
-def resolve_coreference(text, max_length=1024):
-    # Split the text into chunks of max_length tokens
-    text_chunks = [text[i:i+max_length] for i in range(0, len(text), max_length)]
-    
-    resolved_chunks = []
-    for chunk in text_chunks:
-        inputs = tokenizer(chunk, return_tensors="pt", truncation=True, padding=True, max_length=max_length)
-        outputs = model(**inputs)
-        resolved_chunk = tokenizer.decode(outputs.logits.argmax(dim=-1)[0])
-        resolved_chunks.append(resolved_chunk)
-    
-    resolved_text = " ".join(resolved_chunks)
-    return resolved_text
+def find_antecedent(pronoun):
+    for token in pronoun.doc:
+        if token.pos_ == "PROPN" or token.pos_ == "NOUN":
+            if token.dep_ in ["nsubj", "dobj", "pobj"] and token.i < pronoun.i:
+                return token
+    return None
 
 def extract_characters(text):
-    chunks = chunk_text(text)
-    resolved_chunks = [resolve_coreference(chunk) for chunk in chunks]
-    resolved_text = " ".join(resolved_chunks)
-    resolved_doc = nlp(resolved_text)
+    doc = nlp(text)
     characters = {}
-    for ent in resolved_doc.ents:
+    for ent in doc.ents:
         if ent.label_ == "PERSON":
             name_parts = ent.text.split()
             if len(name_parts) > 1:
-                # If the name has multiple parts, use the last name as the key
                 last_name = name_parts[-1]
                 characters[last_name] = ent.text
             else:
-                # If the name has only one part, use it as both the key and value
                 characters[ent.text] = ent.text
     return list(characters.values())
 
-# text_processing.py
 def analyze_relationships(text, characters):
     resolved_text = resolve_coreference(text)
     doc = nlp(resolved_text)
