@@ -2,7 +2,7 @@
 import spacy
 from transformers import BertTokenizer, BertForMaskedLM
 
-nlp = spacy.load("en_core_web_trf")
+nlp = spacy.load("en_core_web_md")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 model = BertForMaskedLM.from_pretrained("bert-base-uncased")
 
