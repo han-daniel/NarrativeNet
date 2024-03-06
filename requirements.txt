@@ -6,4 +6,3 @@ thinc==8.1.8
 NetworkX==2.8.7
 Werkzeug==2.3.3
 gunicorn==20.1.0
-en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.5.0/en_core_web_trf-3.5.0-py3-none-any.whl#sha256=8902305d2ced83d98a8e88efd93ea8970a70dda9bb24b0024a8b798d1cc913d5
