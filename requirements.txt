@@ -1,6 +1,10 @@
 Flask==2.2.5
 Flask-CORS==3.0.10
-Spacy==3.5.4
+spacy==3.5.4
+spacy-alignments==0.9.1
+spacy-legacy==3.0.12
+spacy-loggers==1.0.5
+spacy-transformers==1.2.5
 typing_extensions<4.6.0
 thinc==8.1.8
 NetworkX==2.8.7
