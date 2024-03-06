@@ -1,3 +1,4 @@
+/* style.css */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -5,33 +6,15 @@ body {
     text-align: center;
 }
 
-textarea {
-    width: 80%;
-    height: 100px;
-    margin-top: 20px;
+.container {
+    max-width: 960px;
+    margin: 0 auto;
 }
 
-button {
-    margin-top: 10px;
-    margin-bottom: 20px;
+#networkVisualization {
+    margin-top: 20px;
 }
 
 #results {
     margin-top: 20px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    text-align: left;
-    padding: 8px;
-}
-
-th {
-    background-color: #f2f2f2;
 }
