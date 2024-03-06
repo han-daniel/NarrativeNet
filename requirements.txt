@@ -7,4 +7,3 @@ thinc==8.1.8
 NetworkX==2.8.7
 Werkzeug==2.3.3
 gunicorn==20.1.0
-transformers[tokenizers,pytorch]==4.29.2
