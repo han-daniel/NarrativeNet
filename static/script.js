@@ -1,7 +1,7 @@
+// script.js
 document.getElementById('textForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    // Clear existing graph before creating a new one
     const networkVisualization = document.getElementById('networkVisualization');
     networkVisualization.innerHTML = '';
 
@@ -24,7 +24,7 @@ document.getElementById('textForm').addEventListener('submit', function(e) {
             throw new Error(data.error || 'Error in processing');
         }
         createMetricsTable(data.metrics);
-        renderNetwork(data.network); // This function will create a new graph
+        renderNetwork(data.network);
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -65,20 +65,54 @@ document.getElementById('exportMetrics').addEventListener('click', function() {
 
 function createMetricsTable(metrics) {
     const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = ''; // Clear previous results
+    resultsDiv.innerHTML = '';
 
     Object.keys(metrics).forEach(metric => {
         const table = document.createElement('table');
+        table.classList.add('table', 'table-striped');
+
         const header = table.createTHead();
         const headerRow = header.insertRow(0);
-        headerRow.insertCell(0).innerText = 'Character';
-        headerRow.insertCell(1).innerText = metric;
+        const characterHeader = headerRow.insertCell(0);
+        const metricHeader = headerRow.insertCell(1);
+        characterHeader.innerText = 'Character';
+        metricHeader.innerText = metric;
+        characterHeader.style.fontWeight = 'bold';
+        metricHeader.style.fontWeight = 'bold';
 
         const body = table.createTBody();
-        Object.entries(metrics[metric]).forEach(([character, value]) => {
+        const sortedEntries = Object.entries(metrics[metric]).sort((a, b) => b[1] - a[1]);
+        const topFive = sortedEntries.slice(0, 5);
+        const rest = sortedEntries.slice(5);
+
+        topFive.forEach(([character, value]) => {
             const row = body.insertRow();
             row.insertCell(0).innerText = character;
-            row.insertCell(1).innerText = value;
+            row.insertCell(1).innerText = value.toFixed(3);
+        });
+
+        const expandRow = body.insertRow();
+        const expandCell = expandRow.insertCell(0);
+        expandCell.colSpan = 2;
+        const expandButton = document.createElement('button');
+        expandButton.innerText = 'Show More';
+        expandButton.classList.add('btn', 'btn-sm', 'btn-secondary', 'mt-2');
+        expandCell.appendChild(expandButton);
+
+        expandButton.addEventListener('click', function() {
+            if (expandButton.innerText === 'Show More') {
+                rest.forEach(([character, value]) => {
+                    const row = body.insertRow(body.rows.length - 1);
+                    row.insertCell(0).innerText = character;
+                    row.insertCell(1).innerText = value.toFixed(3);
+                });
+                expandButton.innerText = 'Show Less';
+            } else {
+                while (body.rows.length > topFive.length + 1) {
+                    body.deleteRow(body.rows.length - 2);
+                }
+                expandButton.innerText = 'Show More';
+            }
         });
 
         resultsDiv.appendChild(table);
@@ -88,45 +122,35 @@ function createMetricsTable(metrics) {
 function renderNetwork(data) {
     const width = 800, height = 600;
 
-    // Select the SVG element, if it exists.
-    const svgContainer = d3.select("#networkVisualization");
-
-    // Clear any existing SVG to ensure we're creating a new graph.
-    svgContainer.selectAll("svg").remove();
-
-    // Create a new SVG element.
-    const svg = svgContainer.append("svg")
+    const svg = d3.select("#networkVisualization")
+        .append("svg")
         .attr("width", width)
         .attr("height", height);
 
     const simulation = d3.forceSimulation(data.nodes)
-        .force("link", d3.forceLink(data.links).id(d => d.id))
-        .force("charge", d3.forceManyBody())
+        .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
+        .force("charge", d3.forceManyBody().strength(-200))
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    // Create links
     const link = svg.append("g")
         .selectAll("line")
         .data(data.links)
         .enter().append("line")
-        .style("stroke-width", d => Math.sqrt(d.value))
-        .style("stroke", "#999");  // Set a default color for the links
+        .attr("stroke-width", d => Math.sqrt(d.value))
+        .attr("stroke", "#999");
 
-    // Create nodes
     const node = svg.append("g")
         .selectAll("circle")
         .data(data.nodes)
         .enter().append("circle")
-        .attr("r", 5)
-        .style("fill", "blue")
+        .attr("r", 10)
+        .attr("fill", "blue")
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
 
-    // Node labels
     const labels = svg.append("g")
-        .attr("class", "labels")
         .selectAll("text")
         .data(data.nodes)
         .enter().append("text")
@@ -134,40 +158,13 @@ function renderNetwork(data) {
         .attr("dy", ".35em")
         .text(d => d.id);
 
-    // Edge labels
-    const edgeLabels = svg.append("g")
-        .selectAll("text")
-        .data(data.links)
-        .enter().append("text")
-        .style("font-size", 10)
-        .attr("fill", "black")
-        .text(d => d.value);  // Assuming you want to display the value of the link
+    const zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", zoomed);
 
-    simulation
-        .nodes(data.nodes)
-        .on("tick", ticked);
+    svg.call(zoom);
 
-    simulation.force("link")
-        .links(data.links);
-
-        function dragstarted(d) {
-            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-        }
-        
-        function dragged(d) {
-            d.fx = d3.event.x;
-            d.fy = d3.event.y;
-        }
-        
-        function dragended(d) {
-            if (!d3.event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
-        }        
-
-    function ticked() {
+    simulation.on("tick", () => {
         link
             .attr("x1", d => d.source.x)
             .attr("y1", d => d.source.y)
@@ -182,13 +179,27 @@ function renderNetwork(data) {
             .attr("x", d => d.x)
             .attr("y", d => d.y);
 
-        edgeLabels
-            .attr("x", d => (d.source.x + d.target.x) / 2)
-            .attr("y", d => (d.source.y + d.target.y) / 2);
+    });
+
+    function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
     }
 
-    // Drag functions ...
+    function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+
+    function zoomed(event) {
+        svg.selectAll("g")
+            .attr("transform", event.transform);
+    }
 }
-
-
-
