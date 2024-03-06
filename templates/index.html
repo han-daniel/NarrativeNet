@@ -1,22 +1,28 @@
-<!-- index.html contents -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Character Network Analysis</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://d3js.org/d3.v6.min.js"></script>
 </head>
 <body>
-    <h1>Character Network Analysis App</h1>
-    <form id="textForm">
-        <textarea id="textInput" placeholder="Enter text here..."></textarea>
-        <button type="submit">Analyze Text</button>
-    </form>
-    <button id="exportNetwork">Export Network</button>
-    <button id="exportMetrics">Export Metrics</button>
-    <div id="networkVisualization"></div>
-    <div id="results"></div>
+    <div class="container">
+        <h1>Character Network Analysis Tool</h1>
+        <form id="textForm">
+            <div class="form-group">
+                <textarea id="textInput" class="form-control" rows="5" placeholder="Enter text here..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze Text</button>
+        </form>
+        <div class="mt-4">
+            <button id="exportNetwork" class="btn btn-secondary mr-2">Export Network (JSON)</button>
+            <button id="exportMetrics" class="btn btn-secondary">Export Metrics (CSV)</button>
+        </div>
+        <div id="networkVisualization" class="mt-4"></div>
+        <div id="results" class="mt-4"></div>
+    </div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
