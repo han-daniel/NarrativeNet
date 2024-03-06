@@ -1,6 +1,7 @@
 Flask==2.2.5
 Flask-CORS==3.0.10
 spacy==3.5.4
+https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.5.0/en_core_web_lg-3.5.0-py3-none-any.whl
 typing_extensions<4.6.0
 thinc==8.1.8
 NetworkX==2.8.7
