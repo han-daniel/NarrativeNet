@@ -67,7 +67,27 @@ function createMetricsTable(metrics) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
 
+    const metricDescriptions = {
+        'Degree Centrality': 'Degree centrality measures the number of connections a character has. Characters with higher degree centrality are more connected in the network.',
+        'Betweenness Centrality': 'Betweenness centrality measures how often a character lies on the shortest path between other characters. Characters with high betweenness centrality are important for connecting different parts of the network.',
+        'Closeness Centrality': 'Closeness centrality measures how close a character is to all other characters in the network. Characters with high closeness centrality can quickly reach or influence others.',
+        'Eigenvector Centrality': 'Eigenvector centrality measures the influence of a character based on the importance of their connections. Characters with high eigenvector centrality are connected to other well-connected characters.',
+        'Clustering Coefficient': 'Clustering coefficient measures the tendency of characters to cluster together. A high clustering coefficient indicates that a character\'s connections are also well-connected to each other.'
+    };
+
     Object.keys(metrics).forEach(metric => {
+        const row = document.createElement('div');
+        row.classList.add('row', 'mt-4');
+
+        const descriptionCol = document.createElement('div');
+        descriptionCol.classList.add('col-md-3');
+        const description = document.createElement('p');
+        description.innerText = metricDescriptions[metric];
+        descriptionCol.appendChild(description);
+        row.appendChild(descriptionCol);
+
+        const tableCol = document.createElement('div');
+        tableCol.classList.add('col-md-6');
         const table = document.createElement('table');
         table.classList.add('table', 'table-striped');
 
@@ -115,8 +135,87 @@ function createMetricsTable(metrics) {
             }
         });
 
-        resultsDiv.appendChild(table);
+        tableCol.appendChild(table);
+        row.appendChild(tableCol);
+
+        const graphCol = document.createElement('div');
+        graphCol.classList.add('col-md-3');
+        const graphId = `${metric.replace(/\s/g, '')}-graph`;
+        graphCol.setAttribute('id', graphId);
+
+        const graphContainer = document.createElement('div');
+        graphContainer.classList.add('graph-container');
+        graphCol.appendChild(graphContainer);
+
+        const expandGraphButton = document.createElement('button');
+        expandGraphButton.innerText = 'Show More';
+        expandGraphButton.classList.add('btn', 'btn-sm', 'btn-secondary', 'mt-2');
+        expandGraphButton.addEventListener('click', function() {
+            if (expandGraphButton.innerText === 'Show More') {
+                createBarGraph(metrics[metric], graphContainer, false);
+                expandGraphButton.innerText = 'Show Less';
+            } else {
+                createBarGraph(metrics[metric], graphContainer, true);
+                expandGraphButton.innerText = 'Show More';
+            }
+        });
+
+        graphCol.appendChild(expandGraphButton);
+        row.appendChild(graphCol);
+
+        resultsDiv.appendChild(row);
+
+        createBarGraph(metrics[metric], graphContainer, true);
     });
+}
+
+function createBarGraph(data, container, showTopFive) {
+    const sortedData = Object.entries(data).sort((a, b) => b[1] - a[1]);
+    const displayData = showTopFive ? sortedData.slice(0, 5) : sortedData;
+
+    const margin = {top: 20, right: 20, bottom: 60, left: 40};
+    const width = showTopFive ? 300 - margin.left - margin.right : sortedData.length * 50;
+    const height = 200 - margin.top - margin.bottom;
+
+    d3.select(container).selectAll('svg').remove();
+
+    const svg = d3.select(container)
+        .append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleBand()
+        .range([0, width])
+        .padding(0.1);
+    const y = d3.scaleLinear()
+        .range([height, 0]);
+
+    x.domain(displayData.map(d => d[0]));
+    y.domain([0, d3.max(displayData, d => d[1])]);
+
+    svg.selectAll('.bar')
+        .data(displayData)
+        .enter().append('rect')
+        .attr('class', 'bar')
+        .attr('x', d => x(d[0]))
+        .attr('width', x.bandwidth())
+        .attr('y', d => y(d[1]))
+        .attr('height', d => height - y(d[1]))
+        .attr('fill', 'blue');
+
+    svg.append('g')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll('text')
+        .attr('transform', 'rotate(-45)')
+        .attr('text-anchor', 'end')
+        .attr('dx', '-.8em')
+        .attr('dy', '.15em');
+
+    svg.append('g')
+        .call(d3.axisLeft(y));
 }
 
 function renderNetwork(data) {
