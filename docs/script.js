@@ -1,9 +1,11 @@
 // script.js — all analysis now runs in the browser via analysis.js (no server).
 let lastResult = null;
 
-document.getElementById('textForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+// Dune (2021) plot summary, shown and analyzed on page load so visitors
+// land on a populated example.
+const SAMPLE_TEXT = 'In the far future, Duke Leto Atreides, ruler of the ocean planet Caladan, is assigned by the Padishah Emperor Shaddam IV to replace House Harkonnen as the fief rulers of Arrakis. Arrakis is a harsh desert planet and the only source of melange, or "spice", a valuable substance that extends human vitality and lifespan. Leto\'s son Paul has been having visions of Chani, a young Fremen woman. Paul confides in his mother Lady Jessica, his father Leto, and his mentors Duncan Idaho and Gurney Halleck. Jessica is a member of the Bene Gesserit, an exclusive sisterhood whose members possess advanced physical and mental abilities. She has trained Paul in their disciplines. The Reverend Mother Mohiam subjects Paul to a test of humanity. She reveals that Jessica was instructed to bear a daughter, but she disobeyed and bore a son. Leto, Jessica, and Paul travel to Arrakis. Duncan warns Leto that the Fremen consider the planet theirs. The Baron Vladimir Harkonnen plots to destroy House Atreides. Doctor Yueh betrays Leto, disabling the shields protecting the Atreides. The Baron kills Leto. Jessica and Paul escape into the desert. They are found by Fremen led by Stilgar, whose group includes Chani. Paul defeats Jamis in a duel, and Jessica and Paul join the Fremen.';
 
+function analyzeAndRender() {
     const networkVisualization = document.getElementById('networkVisualization');
     networkVisualization.innerHTML = '';
     document.getElementById('results').innerHTML = '';
@@ -27,7 +29,18 @@ document.getElementById('textForm').addEventListener('submit', function(e) {
         console.error('Error:', error);
         document.getElementById('results').innerHTML = 'Error: ' + error.message;
     }
+}
+
+document.getElementById('textForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    analyzeAndRender();
 });
+
+const textInput = document.getElementById('textInput');
+if (!textInput.value) {
+    textInput.value = SAMPLE_TEXT;
+    analyzeAndRender();
+}
 
 function downloadBlob(content, mimeType, filename) {
     const blob = new Blob([content], { type: mimeType });
