@@ -1,20 +1,249 @@
 /* style.css */
+:root {
+    --bg: #f6f3ec;
+    --card: #ffffff;
+    --ink: #26232e;
+    --muted: #716c7e;
+    --accent: #5b4fc2;
+    --accent-dark: #483da3;
+    --accent-soft: #edeafb;
+    --border: #e5e0d4;
+    --shadow: 0 1px 2px rgba(38, 35, 46, 0.05), 0 8px 24px rgba(38, 35, 46, 0.06);
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
     margin: 0;
     padding: 0;
-    text-align: center;
+    line-height: 1.6;
 }
 
 .container {
-    max-width: 960px;
+    max-width: 1000px;
     margin: 0 auto;
+    padding: 0 20px 64px;
 }
 
-#networkVisualization {
-    margin-top: 20px;
+/* ---- header ---- */
+
+.site-header {
+    text-align: center;
+    padding: 56px 20px 8px;
 }
 
-#results {
-    margin-top: 20px;
+.site-header h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+}
+
+.site-header h1 .net {
+    color: var(--accent);
+}
+
+.tagline {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    margin: 0 auto 32px;
+}
+
+/* ---- cards ---- */
+
+.card-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.panel-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+}
+
+/* ---- form ---- */
+
+#textInput.form-control {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: #fdfcf9;
+    resize: vertical;
+}
+
+#textInput.form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    outline: none;
+}
+
+.form-text {
+    margin: 8px 0 16px;
+}
+
+.form-text a {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.btn {
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 8px 22px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):active {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+    box-shadow: none;
+}
+
+/* ---- network visualization ---- */
+
+.viz-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.viz-hint {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+#networkVisualization svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #fdfcf9;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+#networkVisualization .node-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--ink);
+    paint-order: stroke;
+    stroke: #fdfcf9;
+    stroke-width: 3px;
+    pointer-events: none;
+}
+
+.export-row {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ---- metrics ---- */
+
+#results .row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 20px 12px;
+    margin: 24px 0 0;
+}
+
+#results .metric-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+#results p {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+#results .table {
+    margin-bottom: 0;
+    color: var(--ink);
+}
+
+#results .table td {
+    border-top: 1px solid var(--border);
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+#results .table thead td {
+    border-top: none;
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+#results .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #faf8f3;
+}
+
+.graph-container {
+    overflow-x: auto;
+}
+
+.graph-container .tick text {
+    fill: var(--muted);
+    font-family: 'Inter', sans-serif;
+}
+
+.graph-container .domain,
+.graph-container .tick line {
+    stroke: var(--border);
+}
+
+/* ---- footer ---- */
+
+.site-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 24px 20px 48px;
+}
+
+.site-footer a {
+    color: var(--accent);
+    font-weight: 500;
 }

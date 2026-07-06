@@ -87,6 +87,10 @@ function createMetricsTable(metrics) {
 
         const descriptionCol = document.createElement('div');
         descriptionCol.classList.add('col-md-3');
+        const metricName = document.createElement('h3');
+        metricName.classList.add('metric-name');
+        metricName.innerText = metric;
+        descriptionCol.appendChild(metricName);
         const description = document.createElement('p');
         description.innerText = metricDescriptions[metric];
         descriptionCol.appendChild(description);
@@ -209,7 +213,8 @@ function createBarGraph(data, container, showTopFive) {
         .attr('width', x.bandwidth())
         .attr('y', d => y(d[1]))
         .attr('height', d => height - y(d[1]))
-        .attr('fill', 'blue');
+        .attr('rx', 3)
+        .attr('fill', '#5b4fc2');
 
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
@@ -225,41 +230,60 @@ function createBarGraph(data, container, showTopFive) {
 }
 
 function renderNetwork(data) {
-    const width = 800, height = 600;
+    const width = 900, height = 560;
 
     const svg = d3.select("#networkVisualization")
         .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+
+    // Single zoomable group so pan/zoom transforms everything together.
+    const zoomGroup = svg.append("g");
+
+    const color = d3.scaleOrdinal(d3.schemeTableau10).domain(data.nodes.map(d => d.id));
+    const maxDegree = d3.max(data.nodes, d => d['Degree Centrality']) || 1;
+    const radius = d => 7 + 13 * (d['Degree Centrality'] || 0) / maxDegree;
 
     const simulation = d3.forceSimulation(data.nodes)
-        .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
-        .force("charge", d3.forceManyBody().strength(-200))
-        .force("center", d3.forceCenter(width / 2, height / 2));
+        .force("link", d3.forceLink(data.links).id(d => d.id).distance(110))
+        .force("charge", d3.forceManyBody().strength(-320))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collide", d3.forceCollide(d => radius(d) + 6));
 
-    const link = svg.append("g")
+    const maxWeight = d3.max(data.links, d => d.value) || 1;
+
+    const link = zoomGroup.append("g")
         .selectAll("line")
         .data(data.links)
         .enter().append("line")
-        .attr("stroke-width", d => Math.sqrt(d.value))
-        .attr("stroke", "#999");
+        .attr("stroke-width", d => 1 + 4 * d.value / maxWeight)
+        .attr("stroke", "#b9b2a4")
+        .attr("stroke-opacity", 0.6)
+        .attr("stroke-linecap", "round");
 
-    const node = svg.append("g")
+    const node = zoomGroup.append("g")
         .selectAll("circle")
         .data(data.nodes)
         .enter().append("circle")
-        .attr("r", 10)
-        .attr("fill", "blue")
+        .attr("r", radius)
+        .attr("fill", d => color(d.id))
+        .attr("stroke", "#fdfcf9")
+        .attr("stroke-width", 2)
+        .style("cursor", "grab")
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
 
-    const labels = svg.append("g")
+    node.append("title")
+        .text(d => `${d.id}\nDegree: ${d['Degree Centrality']}\nBetweenness: ${d['Betweenness Centrality']}\nCloseness: ${d['Closeness Centrality']}\nEigenvector: ${d['Eigenvector Centrality']}\nClustering: ${d['Clustering Coefficient']}`);
+
+    const labels = zoomGroup.append("g")
         .selectAll("text")
         .data(data.nodes)
         .enter().append("text")
-        .attr("dx", 12)
+        .attr("class", "node-label")
+        .attr("dx", d => radius(d) + 4)
         .attr("dy", ".35em")
         .text(d => d.id);
 
@@ -304,7 +328,6 @@ function renderNetwork(data) {
     }
 
     function zoomed(event) {
-        svg.selectAll("g")
-            .attr("transform", event.transform);
+        zoomGroup.attr("transform", event.transform);
     }
 }

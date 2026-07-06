@@ -2,29 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Character Network Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NarrativeNet — Character Network Analysis</title>
+    <meta name="description" content="Paste a plot summary and see the story's social graph: character networks, centrality metrics, and exports.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header class="site-header">
+        <h1>Narrative<span class="net">Net</span></h1>
+        <p class="tagline">Paste a plot summary and see the story's social graph — who connects whom, and who holds the narrative together.</p>
+    </header>
     <div class="container">
-        <h1>Character Network Analysis Tool</h1>
-        <form id="textForm">
-            <div class="form-group">
-                <textarea id="textInput" class="form-control" rows="5" placeholder="Paste synoptic text here. (e.g. Movie plot summaries from Wikipedia)"></textarea>
-                <small class="form-text text-muted">
-                    Try <a href="https://en.wikipedia.org/wiki/Dune_(2021_film)" target="_blank">Dune</a> or <a href="https://en.wikipedia.org/wiki/Ricky_Stanicky" target="_blank">Ricky Stanicky</a>
-                </small>
+        <section class="card-panel">
+            <h2 class="panel-title">Analyze a story</h2>
+            <form id="textForm">
+                <div class="form-group">
+                    <textarea id="textInput" class="form-control" rows="6" placeholder="Paste synoptic text here. (e.g. Movie plot summaries from Wikipedia)"></textarea>
+                    <small class="form-text text-muted">
+                        Try <a href="https://en.wikipedia.org/wiki/Dune_(2021_film)" target="_blank" rel="noopener">Dune</a> or <a href="https://en.wikipedia.org/wiki/Ricky_Stanicky" target="_blank" rel="noopener">Ricky Stanicky</a> — everything runs in your browser, nothing is uploaded.
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary">Analyze Text</button>
+            </form>
+        </section>
+        <section class="card-panel">
+            <div class="viz-header">
+                <h2 class="panel-title">Character network</h2>
+                <span class="viz-hint">Node size = connectedness · drag nodes · scroll to zoom · hover for metrics</span>
             </div>
-            <button type="submit" class="btn btn-primary">Analyze Text</button>
-        </form>
-        <div class="mt-4">
-            <button id="exportNetwork" class="btn btn-secondary mr-2">Export Network (JSON)</button>
-            <button id="exportMetrics" class="btn btn-secondary">Export Metrics (CSV)</button>
-        </div>
-        <div id="networkVisualization" class="mt-4"></div>
-        <div id="results" class="mt-4"></div>
+            <div id="networkVisualization"></div>
+            <div class="export-row">
+                <button id="exportNetwork" class="btn btn-secondary">Export Network (JSON)</button>
+                <button id="exportMetrics" class="btn btn-secondary">Export Metrics (CSV)</button>
+            </div>
+        </section>
+        <div id="results"></div>
     </div>
+    <footer class="site-footer">
+        <a href="https://github.com/han-daniel/NarrativeNet" target="_blank" rel="noopener">NarrativeNet on GitHub</a> — character extraction and network metrics computed entirely client-side.
+    </footer>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/compromise@14.15.1/builds/compromise.js"></script>
     <script src="analysis.js"></script>
